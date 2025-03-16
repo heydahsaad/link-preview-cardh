@@ -22,9 +22,11 @@ export class ThatProject extends DDDSuper(I18NMixin(LitElement)) {
     super();
     this.title = "";
     this.webLink = "";    
-    this.imageLink = "";
+    this.imageLink = "https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fwww.ncenet.com%2Fwp-content%2Fuploads%2F2020%2F04%2Fno-image-png-2.png&f=1&nofb=1&ipt=6684568251b56d8ed89187e9e52fe7e6dfe7e84d19840142bf1d886bce8fedda&ipo=images";
     this.value = null;
     this.loading = false;
+    this.logo = "";
+    this.themeColor = "";
 
     this.t = this.t || {};
     this.t = {
@@ -49,6 +51,8 @@ export class ThatProject extends DDDSuper(I18NMixin(LitElement)) {
       webLink: { type: String, attribute: "web-link" },
       description: { type: String },
       imageLink: { type: String, attribute: "image-link" },
+      themeColor: {type: String},
+      logo: {type: String},
     };
   }
 
@@ -57,7 +61,8 @@ export class ThatProject extends DDDSuper(I18NMixin(LitElement)) {
     return [super.styles,
     css`
       :host {
-        display: block;
+        display: flex;
+        flex-wrap: wrap;
         color: var(--ddd-theme-primary);
         background-color: var(--ddd-theme-accent);
         font-family: var(--ddd-font-navigation);
@@ -65,16 +70,67 @@ export class ThatProject extends DDDSuper(I18NMixin(LitElement)) {
       .wrapper {
         margin: var(--ddd-spacing-2);
         padding: var(--ddd-spacing-4);
+        border-radius: var(--ddd-radius-lg);
+        border: var(--ddd-border-md);
+        border-color: var(--ddd-theme-default-pughBlue);
+        border-width: 8px;
       }
       h3 span {
         font-size: var(--that-project-label-font-size, var(--ddd-font-size-s));
       }
-      img {
+
+      img{
           display: block;
-          max-width: 400px;
-          max-height: 400px;
+          width: 340px;
+          /* max-height: 300px; */
           height: auto;
-          margin: var(--ddd-spacing-2);
+          align-items: center;
+          margin: 4px auto;
+        }
+      
+        .logo{
+          display: block;
+          width: 100px;
+        }
+
+        .link{
+          list-style: none;
+          padding: 4px;
+          margin: 4px auto;
+          border-radius: var(--ddd-radius-lg);
+          display: block;
+          background-color: var(--ddd-theme-default-accent);
+          color: white ;
+          text-align:center;
+        }
+
+        .link:hover{
+          color: red;
+        }
+
+        .mainTitle{
+         color: var(--ddd-theme-default-slateMaxLight);
+         background-color: var(--ddd-theme-default-slateGray);
+         text-align: center;
+         border-radius: var(--ddd-radius-md);
+         font-family: Times, Times New Roman, serif;
+         margin: var(--ddd-spacing-2);
+         padding: var(--ddd-spacing-2);
+        }
+
+
+        .loader {
+          border: 13px solid #f3f3f3; /* Light grey */
+          border-top: 13px solid #3498db; /* Blue */
+          border-radius: 50%;
+          width: 50px;
+          height: 50px;
+          animation: spin 2s linear infinite;
+        }
+
+        @keyframes spin {
+          0% { transform: rotate(0deg); }
+          100% { transform: rotate(360deg); }
         }
     `];
   }
@@ -86,54 +142,170 @@ export class ThatProject extends DDDSuper(I18NMixin(LitElement)) {
     }
   }
 
-updateResults(value) {
-  this.loading = true;
-  fetch(
-    `https://corsproxy.io/?url=https://open-apis.hax.cloud/api/services/website/metadata?q=${this.webLink}`
-  )
-    .then((d) => (d.ok ? d.json() : {}))
-    .then((response) => {
-      if (response.data["og:title"]) {
-        this.title = response.data["og:title"];
-      }
-      if (response.data["og:description"]) {
-        this.description = response.data["og:description"];
-      }
-      if (response.data["description"]) {
-        this.description = response.data["description"];
-      }
-      if (response.data["og:image"]) {
-        this.imageLink = response.data["og:image"];
-      } else if (response.data["ld+json"].logo) {
-        this.imageLink = response.data["ld+json"].logo;
-      } else if (response.data["og:title"]) {
-        this.imageLink = response.data["ld+json"]["publisher"].logo;
-      }
-    });
-}
+  // updateResults(value) {
+  //   this.loading = true;
+  //   fetch(
+  //     `https://corsproxy.io/?url=https://open-apis.hax.cloud/api/services/website/metadata?q=${this.webLink}`
+  //   )
+  //     .then((d) => (d.ok ? d.json() : {}))
+  //     .then((response) => {
+  //       if (response.data["og:title"]) {
+  //         this.title = response.data["og:title"];
+  //       }
+  //       if (response.data["og:description"]) {
+  //         this.description = response.data["og:description"];
+  //       }
+  //       if (response.data["description"]) {
+  //         this.description = response.data["description"];
+  //       }
+  //       if (response.data["og:image"]) {
+  //         this.imageLink = response.data["og:image"];
+  //       } else if (response.data["ld+json"].logo) {
+  //         this.imageLink = response.data["ld+json"].logo;
+  //       } else if (response.data["og:title"]) {
+  //         this.imageLink = response.data["ld+json"]["publisher"].logo;
+  //       }
+  //     })
+  // }
 
-render() {
-  return html`
-    <div class="wrapper">
-      <h2>${this.title}</h2>
-      <!-- <p><a href="${this.webLink}" target="_blank">${this.webLink}</a></p> -->
-      <p>${this.description}</p>
-      <img
-        src="${this.imageLink}"
-        alt="${this.t.title}: ${this.title}"
-        loading="lazy"
-        width="100%"
-      />
-      <slot></slot>
-    </div>
-  <!-- <details open></details> -->
-  `;
-}
+  updateResults() {
+    this.loading = true;
+    this.errorMessage = ""; // Reset previous errors
+  
+    fetch(
+      `https://corsproxy.io/?url=https://open-apis.hax.cloud/api/services/website/metadata?q=${this.webLink}`
+    )
+      .then(response => {
+        if (!response.ok) {
+          throw new Error(`Error: ${response.status}`);
+        }
+        return response.json(); // Parse JSON only if response is okay
+      })
 
+      .then(response => {
+        this.title = response.data["og:title"] || 
+                     response.data["title"] || "No Title Found";
+        this.description = response.data["og:description"] || response.data["description"] || "No Description Available";
+        this.imageLink = response.data["og:image"] || 
+                         (response.data["ld+json"]?.logo) || 
+                         (response.data["ld+json"]?.publisher?.logo) || 
+                         (response.data["msapplication-TileImage"]) ||
+                         (response.data["apple-touch-icon"]) ||
+                         "fallback-image.png";
+        this.logo = response.data["ld+json"].logo;
+        this.themeColor = response.data["theme-color"] || (response.data["msapplication-TileColor"]) || "No color";
+      })
+
+      .catch(error => {
+        console.error("Fetch error",error);
+        this.errorMessage = "salahhh"
+      })
+      .finally(() => {
+        this.loading = false; // Ensure loading stops
+      });
+  }
+
+  firstUpdated() {
+    this.myFunction(); // Start the loading process
+  }
+
+  myFunction(){
+    setTimeout(() => {
+      this.showPage();
+    }, 1000);
+  }
+
+  showPage(){
+    this.shadowRoot.getElementById("loader").style.display="none";
+    this.shadowRoot.getElementById("myDiv").style.display="block";
+  }
+
+  render() {
+    return html`
+      <div class="loader" id="loader"></div>
+      <div class="wrapper" id="myDiv" style="display: none; border-color:${this.themeColor}" >
+        <p style="margin: 0px;" class="link">Visit: <a href="${this.webLink}" target="_blank">${this.webLink}</a></p>
+        <img
+          src="${this.imageLink}"
+          alt="${this.t.title}: ${this.title}"
+          loading="lazy"
+        />
+        <h2 class="mainTitle" 
+            style="background-color:${this.themeColor}; 
+                  color: ${this.themeColor === '#ffffff' ? 'black' : 'white'};">
+          ${this.title}
+        </h2>
+        <p style="text-shadow: 2px 0px 6px #000000;">${this.description}</p>
+        <p>Theme color: ${this.themeColor}</p>
+        <img
+          src="${this.logo}"   
+          class="logo"     
+        />
+        <slot></slot>
+      </div>
+    <!-- <details open></details> -->
+    `;
+  }
+
+
+  // updateResults() {
+  //   this.loading = true;
+  //   this.errorMessage = ""; // Reset previous errors
+  
+  //   // Set a timeout to cancel the fetch request if it takes too long
+  //   const controller = new AbortController();
+  //   const timeoutId = setTimeout(() => controller.abort(), 5000); // Timeout after 5 seconds
+  
+  //   fetch(
+  //     `https://corsproxy.io/?url=https://open-apis.hax.cloud/api/services/website/metadata?q=${this.webLink}`,
+  //     { signal: controller.signal }
+  //   )
+  //     .then(response => {
+  //       clearTimeout(timeoutId); // Clear timeout if response is received in time
+  
+  //       if (!response.ok) {
+  //         throw new Error("No Preview Available"); // Handle all errors generically here
+  //       }
+  
+  //       return response.json();
+  //     })
+  //     .then(response => {
+  //       if (!response || !response.data) {
+  //         throw new Error("No Preview Available"); // API data is missing
+  //       }
+  
+  //       this.title = response.data["og:title"] || "No Title Found";
+  //       this.description = response.data["og:description"] || response.data["description"] || "No Description Available";
+  //       this.imageLink = response.data["og:image"] || 
+  //                        response.data["ld+json"]?.logo || 
+  //                        response.data["ld+json"]?.publisher?.logo || 
+  //                        response.data["msapplication-TileImage"] || 
+  //                        null;
+  //       this.themeColor = response.data["theme-color"] || response.data["msapplication-TileColor"] || "No color";
+  
+  //       // Check if imageLink or themeColor is missing
+  //       if (!this.imageLink || !this.themeColor) {
+  //         throw new Error("No Preview Available");
+  //       }
+  //     })
+  //     .catch(error => {
+  //       console.error("Fetch error:", error);
+  //       this.errorMessage = "No preview available"; // Set error message
+  //     })
+  //     .finally(() => {
+  //       // Ensure loading stays for at least 2 seconds before showing content
+  //       setTimeout(() => {
+  //         this.loading = false;
+  //         this.showPage();
+  //       }, 2000);
+  //     });
+  // }
+  
 
   /**
    * haxProperties integration via file reference
    */
+
   static get haxProperties() {
     return new URL(`./lib/${this.tag}.haxProperties.json`, import.meta.url)
       .href;
