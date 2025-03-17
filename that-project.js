@@ -27,6 +27,7 @@ export class ThatProject extends DDDSuper(I18NMixin(LitElement)) {
     this.loading = false;
     this.logo = "";
     this.themeColor = "";
+    this.statusCode = "";
 
     this.t = this.t || {};
     this.t = {
@@ -53,6 +54,7 @@ export class ThatProject extends DDDSuper(I18NMixin(LitElement)) {
       imageLink: { type: String, attribute: "image-link" },
       themeColor: {type: String},
       logo: {type: String},
+      statusCode: {type: String},
     };
   }
 
@@ -168,6 +170,21 @@ export class ThatProject extends DDDSuper(I18NMixin(LitElement)) {
   //     })
   // }
 
+  firstUpdated() {
+    this.myFunction(); // Start the loading process
+  }
+
+  myFunction(){
+    setTimeout(() => {
+      this.showPage();
+    }, 1000);
+  }
+
+  showPage(){
+    this.shadowRoot.getElementById("loader").style.display="none";
+    this.shadowRoot.getElementById("myDiv").style.display="block";
+  }
+
   updateResults() {
     this.loading = true;
     this.errorMessage = ""; // Reset previous errors
@@ -175,6 +192,7 @@ export class ThatProject extends DDDSuper(I18NMixin(LitElement)) {
     fetch(
       `https://corsproxy.io/?url=https://open-apis.hax.cloud/api/services/website/metadata?q=${this.webLink}`
     )
+
       .then(response => {
         if (!response.ok) {
           throw new Error(`Error: ${response.status}`);
@@ -198,26 +216,11 @@ export class ThatProject extends DDDSuper(I18NMixin(LitElement)) {
 
       .catch(error => {
         console.error("Fetch error",error);
-        this.errorMessage = "salahhh"
+        this.errorMessage = "Error"
       })
       .finally(() => {
         this.loading = false; // Ensure loading stops
       });
-  }
-
-  firstUpdated() {
-    this.myFunction(); // Start the loading process
-  }
-
-  myFunction(){
-    setTimeout(() => {
-      this.showPage();
-    }, 1000);
-  }
-
-  showPage(){
-    this.shadowRoot.getElementById("loader").style.display="none";
-    this.shadowRoot.getElementById("myDiv").style.display="block";
   }
 
   render() {
@@ -225,6 +228,7 @@ export class ThatProject extends DDDSuper(I18NMixin(LitElement)) {
       <div class="loader" id="loader"></div>
       <div class="wrapper" id="myDiv" style="display: none; border-color:${this.themeColor}" >
         <p style="margin: 0px;" class="link">Visit: <a href="${this.webLink}" target="_blank">${this.webLink}</a></p>
+        
         <img
           src="${this.imageLink}"
           alt="${this.t.title}: ${this.title}"
@@ -246,60 +250,6 @@ export class ThatProject extends DDDSuper(I18NMixin(LitElement)) {
     <!-- <details open></details> -->
     `;
   }
-
-
-  // updateResults() {
-  //   this.loading = true;
-  //   this.errorMessage = ""; // Reset previous errors
-  
-  //   // Set a timeout to cancel the fetch request if it takes too long
-  //   const controller = new AbortController();
-  //   const timeoutId = setTimeout(() => controller.abort(), 5000); // Timeout after 5 seconds
-  
-  //   fetch(
-  //     `https://corsproxy.io/?url=https://open-apis.hax.cloud/api/services/website/metadata?q=${this.webLink}`,
-  //     { signal: controller.signal }
-  //   )
-  //     .then(response => {
-  //       clearTimeout(timeoutId); // Clear timeout if response is received in time
-  
-  //       if (!response.ok) {
-  //         throw new Error("No Preview Available"); // Handle all errors generically here
-  //       }
-  
-  //       return response.json();
-  //     })
-  //     .then(response => {
-  //       if (!response || !response.data) {
-  //         throw new Error("No Preview Available"); // API data is missing
-  //       }
-  
-  //       this.title = response.data["og:title"] || "No Title Found";
-  //       this.description = response.data["og:description"] || response.data["description"] || "No Description Available";
-  //       this.imageLink = response.data["og:image"] || 
-  //                        response.data["ld+json"]?.logo || 
-  //                        response.data["ld+json"]?.publisher?.logo || 
-  //                        response.data["msapplication-TileImage"] || 
-  //                        null;
-  //       this.themeColor = response.data["theme-color"] || response.data["msapplication-TileColor"] || "No color";
-  
-  //       // Check if imageLink or themeColor is missing
-  //       if (!this.imageLink || !this.themeColor) {
-  //         throw new Error("No Preview Available");
-  //       }
-  //     })
-  //     .catch(error => {
-  //       console.error("Fetch error:", error);
-  //       this.errorMessage = "No preview available"; // Set error message
-  //     })
-  //     .finally(() => {
-  //       // Ensure loading stays for at least 2 seconds before showing content
-  //       setTimeout(() => {
-  //         this.loading = false;
-  //         this.showPage();
-  //       }, 2000);
-  //     });
-  // }
   
 
   /**

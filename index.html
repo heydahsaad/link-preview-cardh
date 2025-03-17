@@ -16,7 +16,7 @@
       margin: var(--ddd-spacing-1);
       /* border: var(--ddd-border-md); */
       border-radius: var(--ddd-radius-lg);
-      width: 400px;
+      max-width: 400px;;
       display: flex;
       flex-wrap: wrap;
     }
@@ -125,8 +125,8 @@
   </body> -->
 
   <body>
-    <div id="demo">
-      <h1>Website Previews</h1>
+    <h1 style="display: block;">Website Previews</h1>
+    <div id="demo" style="display: flex; flex-wrap: wrap;">
       <!-- this is going to do whatever the tag's defaults are -->
       <!-- <div>
         <input id="input" placeholder="Search NASA images" @input="${this.inputChanged}" />
@@ -137,7 +137,6 @@
       <that-project web-link="https://www.netflixs.com"></that-project>
       <that-project web-link="https://www.owalalife.com"></that-project>
       <that-project web-link="https://www.harvard.edu"></that-project>
-
     </div>
     <script type="module" src="./that-project.js"></script>
   </body>
